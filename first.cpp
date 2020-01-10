@@ -6,26 +6,33 @@
 using namespace std;
 
 void get_flightdata();
-void get_pointer();				//get data by iterating struct pointer
+void get_pointer();										//get data by iterating struct pointer
 
 class flight{
 	
 	private:
-	struct flights{				//struct containing the flight data
 		
-		char flightno[6];
-		char dep_date_time[17];
-		char dep_airport[21];
-		char arr_airport[21];
-		char row_no[60][100];	//sub 2d array with seat data
-		
-	}f1;
+		int index;										//to keep of track of flights
+		struct flights{									//struct containing the flight data
+			
+			char flightno[6];
+			char dep_date_time[17];
+			char dep_airport[21];
+			char arr_airport[21];
+			char row_no[60][100];						//sub 2d array with seat data
+			
+		}flight_details[100];
 	
 	public:
 		flight();
 		//setters
-		void new_flight();		//create new flight
-		
+		void new_flight();									//create new flight
+		void display_available();							//option 1
+		void view_flight();									//option 2
+		void seat_availability(string numb);				//option 3
+		char seat_booking(char fno,char seat);				//option 4
+		void get_class(string s,int total,int economy,int business);
+		void exitp();										//exit
 };
 
 int main(){
@@ -37,15 +44,18 @@ int main(){
 	cin>>choice;					//get user's choice
 	
 	flight a ;
+	//a.display_available();
 	
-	/* switch(choice){
+	 switch(choice){
 		
 		case 1:
-			display_available();
+			a.display_available();
+			break;
 		
 		case 2:
-			view_flight();
-			
+			a.view_flight();
+			break;
+		/*	
 		case 3:
 			seat_availability();
 			
@@ -54,8 +64,11 @@ int main(){
 			
 		case 5:
 			exit();
-	} */
-	get_flightdata();				//function call to get input file data about the flights
+			*/
+		default:
+			cout<<"lkkh"<<endl;
+	} 
+	//get_flightdata();				//function call to get input file data about the flights
 	
 	return 0;
 }
@@ -87,15 +100,197 @@ void get_flightdata(){
 
 flight::flight(){
 	
-	flights* f2=new flights();
-	flights *p=f2;
+	index=0;	
+	//insert data into struct array
+	//set 1
+	strcpy(flight_details[index].flightno, "VA301");
+	strcpy(flight_details[index].dep_date_time, "20/02/2020 10:20");
+	strcpy(flight_details[index].dep_airport, "COLOMBO");
+	strcpy(flight_details[index].arr_airport, "SINGAPORE");			//IMPORTANT
+	strcpy(flight_details[index].row_no[0], "10 E AB");				//change to i
+	strcpy(flight_details[index].row_no[1], "15 E CDE");
+	strcpy(flight_details[index].row_no[2], "22 E ADF");
+	strcpy(flight_details[index].row_no[3], "15 E CDE");
+	strcpy(flight_details[index].row_no[4], "15 B CDE");
 	
-	strcpy(p->flightno, "VA301");
-	strcpy(f2->dep_date_time, "20/02/2020 10:20");
-	strcpy(f2->dep_airport, "COLOMBO");
-	strcpy(f2->arr_airport, "SINGAPORE");
-	strcpy(f2->row_no[2], "15 E CDE");
+	//set 2 
+	strcpy(flight_details[1].flightno, "VA305");
+	strcpy(flight_details[1].dep_date_time, "15/02/2020 12:55");
+	strcpy(flight_details[1].dep_airport, "COLOMBO");
+	strcpy(flight_details[1].arr_airport, "GALLE");			//IMPORTANT
+	strcpy(flight_details[1].row_no[0], "10 E AB"); 				//change to i
+	/*strcpy(flight_details[index].row_no[1], "15 E CDE");
+	strcpy(flight_details[index].row_no[2], "22 E ADF");
+	strcpy(flight_details[index].row_no[3], "15 E CDE");
+	strcpy(flight_details[index].row_no[4], "15 B CDE");*/
 	
-	cout<<f2->row_no[2]<<endl;
 	//f2.row_no=""//
+}
+
+void flight::new_flight(){
+	
+	//flights *p=new flights;
+
+	
+}
+
+void flight::get_class(string s,int total,int economy,int business){
+	
+	string delimiter = " ";
+	int pos = 0;
+	string token;											//declare token
+	if((pos=s.find(" E "))!= string::npos){					//process to find whether economy class or business
+	
+		token = s.substr(0, pos);							//repeating for 3 times to get to 3rd line
+		s.erase(0, pos + delimiter.length());
+		token = s.substr(0, pos);
+		s.erase(0, pos + delimiter.length());
+		token = s.substr(0, pos);
+		
+		for (int i = 0; i <= token.size(); i++){			//economy class
+			//seat_info[1]++;
+			//seat_info[0]++;
+		}
+			
+	}else
+	if((pos=s.find(" B "))!= string::npos){					//business class
+		token = s.substr(0, pos);							//repeating for 3 times to get to 3rd line
+		s.erase(0, pos + delimiter.length());
+		token = s.substr(0, pos);
+		s.erase(0, pos + delimiter.length());
+		token = s.substr(0, pos);
+		
+		for (int i = 0; i <= token.size(); i++){
+			//seat_info[2]++;
+			//seat_info[0]++;
+		}
+	}
+	
+	//cout<<"total:"<<seat_info[0]<<endl;
+	//cout<<"economy:"<<seat_info[1]<<endl;
+	//cout<<"business:"<<seat_info[2]<<endl;
+}
+
+void flight::display_available(){
+	
+	int available_flag=0;							//Flag to indicate if there are any flights available
+	for(int i=0;i<100;i++){							//iterate through flight details ,100 is the maximum flight capacity
+		
+		if(strlen(flight_details[i].row_no[0])!= 0){	//the ones who dont have their character array empty will be printed
+			cout<<"i="<<i<<endl;
+			cout<<endl<<"Flight number:\t"<<flight_details[i].flightno<<endl;					//have to format beautifully
+			cout<<"Departure date and time:\t"<<flight_details[i].dep_date_time<<endl;
+			cout<<"Departure airport:\t"<<flight_details[i].dep_airport<<endl;
+			cout<<"Arriving airport:\t"<<flight_details[i].arr_airport<<endl;
+			
+			//getting the number of seats,number of economy and business respectively
+			int j=0;
+			int seats=0;
+			int e=0;
+			int b=0;
+			int seat_info[3]={seats,e,b};
+			int *info;
+			while(strlen(flight_details[i].row_no[j])!= 0){
+				
+				string s=(flight_details[i].row_no[j]);					//convert each row to a string for string operations
+				//get_class(s,j,e,b);									//IMPROVE
+				string delimiter = " ";
+				int pos = 0;
+				string token;											//declare token
+				if((pos=s.find(" E "))!= string::npos){					//process to find whether economy class or business
+				
+    				token = s.substr(0, pos);							//repeating for 3 times to get to 3rd line
+    				s.erase(0, pos + delimiter.length());
+    				token = s.substr(0, pos);
+    				s.erase(0, pos + delimiter.length());
+    				token = s.substr(0, pos);
+    				
+    				for (int i = 0; i <= token.size(); i++){			//economy class
+    					e++;
+    					seats++;
+					}
+    					
+				}else
+				if((pos=s.find(" B "))!= string::npos){					//business class
+					token = s.substr(0, pos);							//repeating for 3 times to get to 3rd line
+    				s.erase(0, pos + delimiter.length());
+    				token = s.substr(0, pos);
+    				s.erase(0, pos + delimiter.length());
+    				token = s.substr(0, pos);
+    				
+    				for (int i = 0; i <= token.size(); i++){
+    					b++;
+    					seats++;
+					}
+				} 
+				j++;	
+			}
+			cout<<"No of available Seats:\t"<<seats<<endl; 	//have to find a way to classify between classes
+			cout<<"Business class=\t"<<b<<endl;
+			cout<<"Economy class=\t"<<e<<endl;
+		}else{
+			break;			//if break isnt here program would run 100 times
+		}
+		
+	}
+}
+
+void flight::view_flight(){
+	
+	string numb;
+	cout<<"Enter flight number: "<<endl;
+	cin>>numb;
+	int i=0;
+	int available=0	;										//flag to denote if its actually there,if available 1
+	while(strlen(flight_details[i].flightno)!= 0){
+		
+		if(flight_details[i].flightno==numb){
+			
+			available=1;
+			cout<<endl<<"Flight number:\t"<<flight_details[i].flightno<<endl;					//have to format beautifully
+			cout<<"Departure date and time:\t"<<flight_details[i].dep_date_time<<endl;
+			cout<<"Departure airport:\t"<<flight_details[i].dep_airport<<endl;
+			cout<<"Arriving airport:\t"<<flight_details[i].arr_airport<<endl;
+			cout<<"Available seats:"<<endl;
+			
+			int j=0;
+			while(strlen(flight_details[i].row_no[j])!= 0){							//IMPROVE
+				
+				cout<<flight_details[i].row_no[j]<<endl;
+				j++;
+			}
+			break;
+		}
+		i++;
+	}
+	
+	if(available==0){
+			
+		cerr << "ERROR" << endl<<"Invalid flight number"<<endl;
+	}
+	
+	
+}
+
+void flight::seat_availability(string numb){
+	
+	"Enter number of seats needed";
+	int no_seats;
+	cin>>no_seats;
+	
+	int i=0;
+	while(strlen(flight_details[i].flightno)!= 0){
+		
+		if(flight_details[i].flightno==numb){
+			
+			int j=0;
+			while(strlen(flight_details[i].row_no[j])!= 0 ){							//IMPROVE
+				
+				cout<<flight_details[i].row_no[j]<<endl;
+				j++;
+			}
+			
+		}
+	}
+	
 }
