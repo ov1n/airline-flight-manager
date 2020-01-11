@@ -29,9 +29,11 @@ class flight{
 		void new_flight();									//create new flight
 		void display_available();							//option 1
 		void view_flight();									//option 2
-		void seat_availability(string numb);				//option 3
-		char seat_booking(char fno,char seat);				//option 4
-		void get_class(string s,int total,int economy,int business);
+		void seat_availability();							//option 3
+		void seat_booking();								//option 4
+		
+		//utilities
+		string get_class(string s,string checker);			//To check whether economy class or business
 		void exitp();										//exit
 };
 
@@ -55,13 +57,15 @@ int main(){
 		case 2:
 			a.view_flight();
 			break;
-		/*	
+			
 		case 3:
-			seat_availability();
+			a.seat_availability();
+			break;
 			
 		case 4:
-			seat_booking();
-			
+			a.seat_booking();
+			break;
+		/*	
 		case 5:
 			exit();
 			*/
@@ -134,41 +138,31 @@ void flight::new_flight(){
 	
 }
 
-void flight::get_class(string s,int total,int economy,int business){
+string flight::get_class(string s,string checker){				//checker to know if Economy or Business
 	
-	string delimiter = " ";
+	string token;
 	int pos = 0;
-	string token;											//declare token
-	if((pos=s.find(" E "))!= string::npos){					//process to find whether economy class or business
-	
-		token = s.substr(0, pos);							//repeating for 3 times to get to 3rd line
-		s.erase(0, pos + delimiter.length());
-		token = s.substr(0, pos);
-		s.erase(0, pos + delimiter.length());
-		token = s.substr(0, pos);
-		
-		for (int i = 0; i <= token.size(); i++){			//economy class
-			//seat_info[1]++;
-			//seat_info[0]++;
-		}
-			
-	}else
-	if((pos=s.find(" B "))!= string::npos){					//business class
-		token = s.substr(0, pos);							//repeating for 3 times to get to 3rd line
-		s.erase(0, pos + delimiter.length());
-		token = s.substr(0, pos);
-		s.erase(0, pos + delimiter.length());
-		token = s.substr(0, pos);
-		
-		for (int i = 0; i <= token.size(); i++){
-			//seat_info[2]++;
-			//seat_info[0]++;
-		}
-	}
-	
-	//cout<<"total:"<<seat_info[0]<<endl;
-	//cout<<"economy:"<<seat_info[1]<<endl;
-	//cout<<"business:"<<seat_info[2]<<endl;
+	int count=0;
+	string delimiter = " ";
+	if((pos=s.find(checker))!= string::npos){					//process to find whether economy class or business
+					//cout<<"pos "<<pos<<endl;
+    				token = s.substr(0, pos);
+    				//cout<<"s first "<<s<<endl;
+					cout<<"token 1 "<<token<<endl;							//repeating for 3 times to get to 3rd line
+    				s.erase(0, pos + delimiter.length());
+    				//cout<<"s after 1 "<<s<<endl;
+    				token = s.substr(0, pos);
+    				//cout<<"token 2 "<<token<<endl;
+    				s.erase(0, pos );
+    				//cout<<"s after 2 "<<s<<endl;
+    				token = s;//.substr(0, pos);
+    				//cout<<"token 3 "<<token<<endl;
+    				
+    				//cout<<"token size "<<token.size()<<endl;
+    					
+				}
+	return token;
+
 }
 
 void flight::display_available(){
@@ -193,36 +187,21 @@ void flight::display_available(){
 			while(strlen(flight_details[i].row_no[j])!= 0){
 				
 				string s=(flight_details[i].row_no[j]);					//convert each row to a string for string operations
-				//get_class(s,j,e,b);									//IMPROVE
-				string delimiter = " ";
-				int pos = 0;
-				string token;											//declare token
-				if((pos=s.find(" E "))!= string::npos){					//process to find whether economy class or business
+				int temp_sum=0;											//temp variable to get value by function										
 				
-    				token = s.substr(0, pos);							//repeating for 3 times to get to 3rd line
-    				s.erase(0, pos + delimiter.length());
-    				token = s.substr(0, pos);
-    				s.erase(0, pos + delimiter.length());
-    				token = s.substr(0, pos);
-    				
-    				for (int i = 0; i <= token.size(); i++){			//economy class
-    					e++;
-    					seats++;
-					}
-    					
-				}else
-				if((pos=s.find(" B "))!= string::npos){					//business class
-					token = s.substr(0, pos);							//repeating for 3 times to get to 3rd line
-    				s.erase(0, pos + delimiter.length());
-    				token = s.substr(0, pos);
-    				s.erase(0, pos + delimiter.length());
-    				token = s.substr(0, pos);
-    				
-    				for (int i = 0; i <= token.size(); i++){
-    					b++;
-    					seats++;
-					}
-				} 
+				//Get economy class
+				string seat_name=get_class(s," E ");
+				temp_sum=seat_name.size();
+				seats+=temp_sum;
+				e+=temp_sum;
+				
+				temp_sum=0;												//reset sum
+				//Get business class
+				seat_name=get_class(s," B ");
+				temp_sum=seat_name.size();
+				seats+=temp_sum;
+				b+=temp_sum;
+				 
 				j++;	
 			}
 			cout<<"No of available Seats:\t"<<seats<<endl; 	//have to find a way to classify between classes
@@ -272,9 +251,12 @@ void flight::view_flight(){
 	
 }
 
-void flight::seat_availability(string numb){
+void flight::seat_availability(){
 	
-	"Enter number of seats needed";
+	string numb;
+	cout<<"Enter flight number: "<<endl;
+	cin>>numb;
+	cout<<"Enter number of seats needed"<<endl;
 	int no_seats;
 	cin>>no_seats;
 	
@@ -282,15 +264,85 @@ void flight::seat_availability(string numb){
 	while(strlen(flight_details[i].flightno)!= 0){
 		
 		if(flight_details[i].flightno==numb){
-			
+			int seats;													//variable to hold number of seats
 			int j=0;
 			while(strlen(flight_details[i].row_no[j])!= 0 ){							//IMPROVE
 				
-				cout<<flight_details[i].row_no[j]<<endl;
+				int temp_sum=0;
+				string seat_name=get_class(flight_details[i].row_no[j]," E ");
+				temp_sum=seat_name.size();				//use get class func to get no of seats
+				seats+=temp_sum;
+				
+				temp_sum=0;												//reset sum
+				//Get business class
+				seat_name=get_class(flight_details[i].row_no[j]," B ");
+				temp_sum=seat_name.size();
+				seats+=temp_sum;
 				j++;
+			}
+			if(no_seats>seats){
+				
+				cerr<<"Sorry...That much seats are unavailble"<<endl;
+			}else{
+				cout<<"Yes seats are available,following are the available seats for respective rows: "<<endl<<"|  Row no. |  Class  |  Seat nos.  |"<<endl;
+				
+				j=0;
+				while(strlen(flight_details[i].row_no[j])!= 0 ){
+					
+					cout<<flight_details[i].row_no[j]<<endl;
+					j++;
+				}
+				
 			}
 			
 		}
+		
+		i++;
 	}
+	
+}
+
+void flight::seat_booking(){
+	
+	string numb;
+	cout<<"Enter flight number: "<<endl;
+	cin>>numb;
+	
+	string seat_class;
+	cout<<"Enter class: (e for economy and b for business)"<<endl;
+	cin>>seat_class;
+	
+	string row_numb;
+	cout<<"Enter row number: "<<endl;
+	cin>>row_numb;
+	
+	string seat_no;
+	cout<<"Enter seat number: "<<endl;
+	cin>>seat_no;
+	
+	int i=0;
+	while(strlen(flight_details[i].flightno)!= 0){			//Iterator
+		
+		if(flight_details[i].flightno==numb){				//Flight number check
+			int j=0;
+			while(strlen(flight_details[i].row_no[j])!= 0){
+				
+				int row_flag=0;								//flag to check if row is available
+				if(flight_details[i].row_no[j]==row_numb){
+					cout<<"cat";
+				}
+				string s;
+				if(seat_class=="e"){
+					string s=get_class(flight_details[i].row_no[j]," E ");
+				}else{
+					string s=get_class(flight_details[i].row_no[j]," B ");
+				}
+				cout<<"Seats"<<s<<endl;
+				j++;
+			}
+		}
+		i++;
+	}
+	
 	
 }

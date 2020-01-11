@@ -19,9 +19,9 @@ class flight{
 			char dep_date_time[17];
 			char dep_airport[21];
 			char arr_airport[21];
-			char row_no[60][100];						//sub 2d array with seat data
+			char row_no[60][n];						//sub 2d array with seat data
 			
-		}flight_details[100];
+		}flight_details[n];
 	
 	public:
 		flight();
@@ -30,10 +30,12 @@ class flight{
 		void display_available();							//option 1
 		void view_flight();									//option 2
 		void seat_availability();							//option 3
-		char seat_booking(char fno,char seat);				//option 4
+		void seat_booking();								//option 4
 		
 		//utilities
-		int get_class(string s,string checker);				//To check whether economy class or business
+		string get_class(string s,string checker);			//To check whether economy class or business
+		string get_row(string s,string checker);
+		string del_seat(string s,string checker,string seat);
 		void exitp();										//exit
 };
 
@@ -61,18 +63,17 @@ int main(){
 		case 3:
 			a.seat_availability();
 			break;
-		/*	
-		case 4:
-			seat_booking();
-			break;
 			
+		case 4:
+			a.seat_booking();
+			break;
+		/*	
 		case 5:
 			exit();
 			*/
 		default:
 			cout<<"lkkh"<<endl;
 	} 
-	//get_flightdata();				//function call to get input file data about the flights
 	
 	return 0;
 }
@@ -114,8 +115,8 @@ flight::flight(){
 	strcpy(flight_details[index].row_no[0], "10 E AB");				//change to i
 	strcpy(flight_details[index].row_no[1], "15 E CDE");
 	strcpy(flight_details[index].row_no[2], "22 E ADF");
-	strcpy(flight_details[index].row_no[3], "15 E CDE");
-	strcpy(flight_details[index].row_no[4], "15 B CDE");
+	strcpy(flight_details[index].row_no[3], "35 E CDE");
+	strcpy(flight_details[index].row_no[4], "45 B CDE");
 	
 	//set 2 
 	strcpy(flight_details[1].flightno, "VA305");
@@ -138,27 +139,80 @@ void flight::new_flight(){
 	
 }
 
-int flight::get_class(string s,string checker){				//checker to know if Economy or Business
+string flight::get_class(string s,string checker){				//checker to know if Economy or Business
 	
 	string token;
 	int pos = 0;
 	int count=0;
 	string delimiter = " ";
 	if((pos=s.find(checker))!= string::npos){					//process to find whether economy class or business
-				
-    				token = s.substr(0, pos);							//repeating for 3 times to get to 3rd line
-    				s.erase(0, pos + delimiter.length());
-    				token = s.substr(0, pos);
-    				s.erase(0, pos + delimiter.length());
-    				token = s.substr(0, pos);
-    				
-    				for (int i = 0; i <= token.size(); i++){			//economy class
-    					count++;
-					}
-    					
-				}
-	return count;
+		//cout<<"pos "<<pos<<endl;
+		token = s.substr(0, pos);
+		//cout<<"s first "<<s<<endl;
+		//cout<<"token 1 "<<token<<endl;							//repeating for 3 times to get to 3rd line
+		s.erase(0, pos + delimiter.length());
+		//cout<<"s after 1 "<<s<<endl;
+		token = s.substr(0, pos);
+		//cout<<"token 2 "<<token<<endl;
+		s.erase(0, pos );
+		//cout<<"s after 2 "<<s<<endl;
+		token = s;//.substr(0, pos);
+		//cout<<"token 3 "<<token<<endl;
+		
+		//cout<<"token size "<<token.size()<<endl;
+    }
+	return token;
 
+}
+
+string flight::del_seat(string s,string checker,string seat){				//checker to know if Economy or Business
+	
+	string token;
+	int pos = 0;
+	int count=0;
+	string delimiter = " ";
+	string token_1;
+	string token_2;
+	string token_3;
+	string new_token;
+	if((pos=s.find(checker))!= string::npos){					//process to find whether economy class or business
+		
+		//The array data is split into 3 tokens for easy referencing
+		token_1= s.substr(0, pos);
+		//cout<<"s first "<<s<<endl;							//debugging
+		s.erase(0, pos + delimiter.length());
+		//cout<<"s after 1 "<<s<<endl;
+		token_2= s.substr(0, pos);
+		s.erase(0, pos );
+		//cout<<"s after del" <<s<<endl;
+		token_3= s.substr(0, pos);
+		//cout<<"s after 2 "<<s<<endl;
+		token = s;//.substr(0, pos);
+		
+		
+		//cout<<"token size "<<token.size()<<endl;
+    }
+	int index=token.find(seat);
+	token.erase(index,1);
+	new_token=token_1+delimiter+token_2+token;
+	
+	return new_token;
+
+}
+
+string flight::get_row(string s,string checker){
+	
+	string token;
+	int pos = 0;
+	int count=0;
+	string delimiter = " ";										//delimeter used to split
+	if((pos=s.find(checker))!= string::npos){					//process to find whether economy class or business
+		//cout<<"pos "<<pos<<endl;
+		token = s.substr(0, pos);
+	}
+	
+	return token;
+	
 }
 
 void flight::display_available(){
@@ -167,7 +221,7 @@ void flight::display_available(){
 	for(int i=0;i<100;i++){							//iterate through flight details ,100 is the maximum flight capacity
 		
 		if(strlen(flight_details[i].row_no[0])!= 0){	//the ones who dont have their character array empty will be printed
-			cout<<"i="<<i<<endl;
+		
 			cout<<endl<<"Flight number:\t"<<flight_details[i].flightno<<endl;					//have to format beautifully
 			cout<<"Departure date and time:\t"<<flight_details[i].dep_date_time<<endl;
 			cout<<"Departure airport:\t"<<flight_details[i].dep_airport<<endl;
@@ -186,13 +240,15 @@ void flight::display_available(){
 				int temp_sum=0;											//temp variable to get value by function										
 				
 				//Get economy class
-				temp_sum+=get_class(s," E ");
+				string seat_name=get_class(s," E ");
+				temp_sum=seat_name.size();
 				seats+=temp_sum;
 				e+=temp_sum;
 				
 				temp_sum=0;												//reset sum
 				//Get business class
-				temp_sum+=get_class(s," B ");
+				seat_name=get_class(s," B ");
+				temp_sum=seat_name.size();
 				seats+=temp_sum;
 				b+=temp_sum;
 				 
@@ -263,20 +319,99 @@ void flight::seat_availability(){
 			while(strlen(flight_details[i].row_no[j])!= 0 ){							//IMPROVE
 				
 				int temp_sum=0;
-				temp_sum+=get_class(flight_details[i].row_no[j]," E ");					//use get class func to get no of seats
+				string seat_name=get_class(flight_details[i].row_no[j]," E ");
+				temp_sum=seat_name.size();				//use get class func to get no of seats
 				seats+=temp_sum;
 				
 				temp_sum=0;												//reset sum
 				//Get business class
-				temp_sum+=get_class(flight_details[i].row_no[j]," B ");
+				seat_name=get_class(flight_details[i].row_no[j]," B ");
+				temp_sum=seat_name.size();
 				seats+=temp_sum;
 				j++;
 			}
-			cout<<"seats="<<seats<<endl;
+			if(no_seats>seats){
+				
+				cerr<<"Sorry...That much seats are unavailble"<<endl;
+			}else{
+				cout<<"Yes seats are available,following are the available seats for respective rows: "<<endl<<"|  Row no. |  Class  |  Seat nos.  |"<<endl;
+				
+				j=0;
+				while(strlen(flight_details[i].row_no[j])!= 0 ){
+					
+					cout<<flight_details[i].row_no[j]<<endl;
+					j++;
+				}
+				
+			}
 			
 		}
 		
 		i++;
 	}
+	
+}
+
+void flight::seat_booking(){
+	
+	string numb;
+	cout<<"Enter flight number: "<<endl;
+	cin>>numb;
+	
+	string seat_class;
+	cout<<"Enter class: (e for economy and b for business)"<<endl;
+	cin>>seat_class;
+	
+	string row_numb;
+	cout<<"Enter row number: "<<endl;
+	cin>>row_numb;
+	
+	string seat_no;
+	cout<<"Enter seat number: "<<endl;
+	cin>>seat_no;
+	
+	int i=0;
+	while(strlen(flight_details[i].flightno)!= 0){			//Iterator
+		
+		int flight_flag=0;
+		if(flight_details[i].flightno==numb){				//Flight number check
+			
+			flight_flag=1;
+			int j=0;
+			while(strlen(flight_details[i].row_no[j])!= 0){
+				
+				cout<<"seat in full "<<flight_details[i].row_no[j]<<endl;
+				int row_flag=0;								//flag to check if row is available
+				
+				string s;									//string used to store row number from object
+				string checker;
+				
+				//classifying seperately for Economy class or Business
+				if(seat_class=="e"){
+					checker=" E ";
+					s=get_row(flight_details[i].row_no[j],checker);
+				}else if(seat_class=="b"){
+					checker=" B ";
+					s=get_row(flight_details[i].row_no[j],checker);
+				}
+				
+				if(s==row_numb){
+					row_flag=1;								//set row flag to 1 since row is available
+					//cout<<"s in function"<<s<<endl;
+					string new_order=del_seat(flight_details[i].row_no[j],checker,seat_no);
+					
+					char cstr[100]; //convert into char array
+					strcpy(cstr, new_order.c_str());
+					strcpy(flight_details[i].row_no[j],cstr);
+					
+					cout<<"Array data :"<<flight_details[i].row_no[j]<<endl;
+					break;
+				}
+				j++;
+			}
+		}
+		i++;
+	}
+	
 	
 }
