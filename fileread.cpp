@@ -13,7 +13,9 @@ class flight{
 		string dep_date_time;
 		string dep_airport;
 		string arr_airport;
-		string row_no[60];						
+		string row_no[60];
+		
+		int row_index;			//the index of row which is available						
 	
 	public:
 		flight();
@@ -22,7 +24,7 @@ class flight{
 		string get_flightno(){return flightno;}
 		string get_dep_date_time(){return dep_date_time;}
 		string get_dep_airport(){return dep_airport;}
-		//string get_rows(){return *row_no;}
+		string get_row(int index){return row_no[index];}
 		string get_arr_airport(){return arr_airport;}	
 		
 		//setters						
@@ -30,16 +32,25 @@ class flight{
 		void set_dep_date_time(string c){dep_date_time=c;}								
 		void set_dep_airport(string c){dep_airport=c;}									
 		void set_arr_airport(string c){arr_airport=c;}
-		int set_rows(string c);						//returns int of index									
+		void set_rows(string c);						//returns int of index									
 		
 		//utilities
+		bool is_empty();										//checks whether any rows are there
 		string get_class(string s,string checker);			//To check whether economy class or business
-		string get_row(string s,string checker);
 		string del_seat(string s,string checker,string seat);
 		void exitp();										//exit
 };
 
 vector<flight> list;				//Dynamic array containing the flights
+void get_flightdata();
+
+int main(){
+	
+	get_flightdata();
+	cout<<"size:"<<list.size()<<endl;
+	
+	return 0;
+}
 
 void get_flightdata(){
 	
@@ -54,6 +65,7 @@ void get_flightdata(){
 	int dep_date_timeFlag=0;
 	int arr_airportFlag=0;
 	int dep_airportFlag=0;
+	int row_index=0;					//index of row to be inserted
 	
 	// Use a while loop together with the  getline() function to read the file line by line
 	//fptr = new flight;
@@ -99,32 +111,37 @@ void get_flightdata(){
 	  		cout<<"arar_ airport is "<<myText<<endl;
 	  		fptr->set_arr_airport(myText);
 	  	}else{
-	  		
-	  		cout<<"blank"<<endl;
-		}
+	  		int no_of_row;
+	  		/*if(fptr->is_empty()){
+	  			cout<<"blank"<<endl;					//???
+			} */
+			fptr->set_rows(myText);
+			cout<<"row "<<myText<<endl;
 
 	  	//cout<<myText<<endl;
 	  	//list.push_back(*fptr);
-	  }
+	  	}
 	  // Output the text from the file
-	  cout << myText;
-	
+	  //cout << myText<<endl;
+	}
 	// Close the file
 	MyReadFile.close();
 	
 }
 
-int main(){
-	
-	get_flightdata();
-	
-	return 0;
-}
-
 flight::flight(){
 	
+	row_index=0;
+	//cout<<"fdfdfd"<<endl;
 }
 
-int flight::set_rows(string c){
-	
+void flight::set_rows(string c){
+	row_no[row_index]=c;
+	row_index++;
 }
+
+bool flight::is_empty(){  
+	if(row_no[0].length()==0){
+		return true;
+	}
+} 
