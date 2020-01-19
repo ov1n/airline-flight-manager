@@ -31,7 +31,7 @@ class flight{
 		string get_flightno(){return flightno;}
 		string get_dep_date_time(){return dep_date_time;}
 		string get_dep_airport(){return dep_airport;}
-		void get_rows();
+		string get_row(int i);
 		string get_arr_airport(){return arr_airport;}
 		int get_free_seats(){return free_seats;}
 		
@@ -43,21 +43,23 @@ class flight{
 		void set_rows(string c);						//returns int of index									
 		
 		//utilities
+		void print_rows();
 		bool is_empty();										//checks whether any rows are there
 		void display_count(flight*);
 		string get_seatno(string s,string checker);				//split seatno text from rows
 		void seat_counter();								//To check whether economy class or business
-		void display_seatclasses();							//Displays seat classes			
+		void display_seatclasses();							//Displays seat classes
+		void seat_booking();			
 		string del_seat(string s,string checker,string seat);
-		void exitp();										//exit
 };
 
 //Dynamic array containing the flights
 vector<flight> list;				
 void get_flightdata();			//Functon to get flight data from file
 void display_available();		//Function to display available flights
-void view_flight();		//Function to view details of single flight
-void seat_availability();
+void view_flight();				//Function to view details of single flight
+void seat_availability();		//Function to check number of seats in a flight
+void seat_booking();			//Function to book seats in a flight
 
 int main(){
 	
@@ -201,13 +203,13 @@ void display_available(){
 			cout<<"Date and time: "<<list[i].get_dep_date_time()<<endl;
 			cout<<"Departure airport: "<<list[i].get_dep_airport()<<endl;
 			cout<<"Arrival airport: "<<list[i].get_arr_airport()<<endl<<endl;
-			cout<<"----No of seats available: ----"<<endl;
+			cout<<"-No of seats available:-"<<endl;
 			list[i].seat_counter();
 			list[i].display_seatclasses();
 		}
 		cout<<endl;
 	}
-	
+	cout<<"----------------"<<endl;
 	if(available==0){
 		cout<<"----Sorry no flights are available----"<<endl;
 	}
@@ -226,12 +228,18 @@ void flight::set_rows(string c){
 	row_index++;
 }
 
-void flight::get_rows(){
-	for(int i=0;i<row_index;i++){
-		cout<<row_no[i]<<endl;
-	}
+string flight::get_row(int i){
+
+		return row_no[i];
+
 }
 
+void flight::print_rows(){
+	
+	for(int i=0;i<row_index;i++){
+		cout<<get_row(i)<<endl;
+	}
+}
 bool flight::is_empty(){  
 	if(row_no[0].length()==0){
 		return true;
@@ -321,12 +329,15 @@ void view_flight(){
 			cout<<"Seats: "<<endl;
 			fptr->seat_counter();						//Count the seats
 			fptr->display_seatclasses();				//Display them
-			fptr->get_rows();
+			fptr->print_rows();
 			break;
 		}
 	}
 	if(isthere==0){
 		cerr<<"----Sorry,flight is not available----"<<endl;
+	}else{
+		
+		cout<<"----------------"<<endl;
 	}
 }
 
@@ -352,7 +363,7 @@ void seat_availability(){
 			if(no_seats<=fptr->get_free_seats()){
 				
 				cout<<"---Yes,seats are available---"<<endl<<endl;
-				fptr->get_rows();
+				fptr->get_row(5);
 			}else{
 				cout<<"---Sorry that much seats are unavailable---"<<endl;
 			}
@@ -363,4 +374,35 @@ void seat_availability(){
 	if(isthere==0){
 		cerr<<"----Sorry,flight is not available----"<<endl;
 	}
+}
+
+void seat_booking(){
+	
+	string number;
+	cout<<"Enter flight number: "<<endl;
+	cin>>number;
+	
+	flight *fptr;
+	bool flight_flag=0;					//Flag to check if flight number is correct
+	for(int i=0;i<list.size();i++){
+		
+		fptr=&list[i];					//advance  pointer eachtime
+		if(number==fptr->get_flightno()){
+			
+			flight_flag=1;
+			if(fptr->is_empty()){
+				
+				cout<<"--Sorry,all seats are booked--"<<endl;
+				break;
+			}
+			string seat_row;
+			cout<<"Enter Seat row: "<<endl;
+			cin>>seat_row;
+			
+			string seat_no;
+			cout<<"Enter seat number: "<<endl;
+			cin>>seat_no;
+		}
+	}
+	
 }
