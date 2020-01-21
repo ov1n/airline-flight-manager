@@ -34,6 +34,7 @@ class flight{
 		string get_row(int i);
 		string get_arr_airport(){return arr_airport;}
 		int get_free_seats(){return free_seats;}
+		int get_row_index(){return row_index;}			//get no of rows in flight
 		
 		//setters						
 		void set_flightno(string c){flightno=c;}				
@@ -50,7 +51,7 @@ class flight{
 		string get_seatno(string s,string checker);				//split seatno text from rows
 		void seat_counter();								//To check whether economy class or business
 		void display_seatclasses();							//Displays seat classes
-		void seat_booking();			
+		void delete_row(int index);							//Deletes empty row and replaces step by step;			
 		string del_seat(string s,string checker,string seat);
 };
 
@@ -61,6 +62,7 @@ void display_available();		//Function to display available flights
 void view_flight();				//Function to view details of single flight
 void seat_availability();		//Function to check number of seats in a flight
 void seat_booking();			//Function to book seats in a flight
+void write_exit();
 
 int main(){
 	
@@ -73,7 +75,7 @@ int main(){
 	cin>>choice;					//get user's choice
 	
 	flight a ;
-	while(choice!=5){		
+	do{		
 		//a.display_available();
 		switch(choice){
 			
@@ -93,17 +95,21 @@ int main(){
 				seat_booking();
 				//cout<<"Array data after:"<<a.flight_details[0].row_no[0]<<endl;
 				break;
-			/*	
+				
 			case 5:
-				exit();
-				*/
+				cout<<"pppp"<<endl;
+				write_exit();
+				break;
+				
 			default:
 				cout<<"Wrong output"<<endl;
 				break;
+		}
+		if(choice!=5){
+			cout<<endl<<"1 Display available flights"<<endl<<"2 View flight"<<endl<<"3 Seat availability"<<endl<<"4 Seat booking"<<endl<<"5 Exit"<<endl<<endl;
+			cin>>choice;	
 		} 
-		cout<<endl<<"1 Display available flights"<<endl<<"2 View flight"<<endl<<"3 Seat availability"<<endl<<"4 Seat booking"<<endl<<"5 Exit"<<endl<<endl;
-		cin>>choice;
-	}
+	}while(choice!=6);
 	
 	return 0;
 }
@@ -117,6 +123,7 @@ void get_flightdata(){
 	ifstream MyReadFile("Flights.txt");
 	//flags for loop
 	int firstobjFlag=0;
+	int lbreak_count=0;					//Increments for every line break,if there are 2 consecutive breaks, exits from file loop
 	int flightnoFlag=0;
 	int dep_date_timeFlag=0;
 	int arr_airportFlag=0;
@@ -133,7 +140,11 @@ void get_flightdata(){
 	  		firstobjFlag=1;
 	  		
 		}else if(myText==""){
+			if(lbreak_count==1){
+				break;				//solution for white space at end of file. if more than 1 space program breaks
+			}
 			//cout<<"space observed"<<endl;
+			lbreak_count=1;
 			list.push_back(*fptr);
 			flightnoFlag=0;
 			dep_date_timeFlag=0;
@@ -145,6 +156,7 @@ void get_flightdata(){
 		
 	  	if(fptr->get_flightno().length()==0){		//if the flight number is not there		
 	  		
+	  		lbreak_count=0;
 	  		flightnoFlag=1;
 	  		//cout<<"Flight number is "<<myText<<endl;
 	  		fptr->set_flightno(myText);
@@ -235,6 +247,14 @@ void flight::set_rows(string c,int index){
 	
 };
 
+void flight::delete_row(int index){
+	
+	for(int i=index+1;i<row_index;i++){
+		row_no[i-1]=row_no[i];
+	}
+	row_index--;
+	
+}
 string flight::get_row(int i){
 
 		return row_no[i];
@@ -449,12 +469,14 @@ void seat_booking(){
         					cerr<<"----Sorry,the seat is not available----"<<endl;
         					break;
 						}
-						cout<<"index"<<index;
+						//cout<<"index"<<index;
 						token_3.erase(index,1);
 						
 						if(token_3==""){									//If there are no more seats
-							cout<<"empty"<<endl;
-							cout<<"\0"<<endl;								//CHECK
+							//cout<<"empty"<<endl;
+							fptr->delete_row(counter);
+							fptr->print_rows();
+							//cout<<"\0"<<endl;								//CHECK
 							
 						}else{
 																		//Concatenation only happens if at least one seat is there
@@ -462,6 +484,7 @@ void seat_booking(){
 							//cout<<"new_token "<<new_token<<endl;
 							fptr->set_rows(new_token,counter);
 						}
+						cout<<"Seat "<<seat_no<<" of row "<<seat_row<<" has been successfully booked"<<endl;
 						break;				//EXPERIMENTAL
 					}
 				}
@@ -476,4 +499,32 @@ void seat_booking(){
 	if(!flight_flag){
 		cerr<<"----Sorry,flight is not available----"<<endl;
 	}
+}
+
+void write_exit(){
+	
+	ofstream outfile("Flightsr.txt",ios::app);
+	cout<<"start"<<endl;
+	
+	if(outfile.is_open())
+    {
+    	flight *fptr;						//flight pointer for each flight
+        for(int i=0;i<list.size();i++){
+        	fptr=&list[i];
+        	outfile<<fptr->get_flightno()<<endl;
+			outfile<<fptr->get_dep_date_time()<<endl;
+			outfile<<fptr->get_dep_airport()<<endl;
+			outfile<<fptr->get_arr_airport()<<endl;
+			int rows=fptr->get_row_index();				//get no of rows for display
+			for(int j=0;j<rows;j++){
+				outfile<<list[i].get_row(j)<<endl;
+			}
+			
+			outfile<<endl;
+			
+        }
+        
+        outfile.close();
+    }
+    else cerr<<"Unable to open file";
 }
