@@ -40,7 +40,8 @@ class flight{
 		void set_dep_date_time(string c){dep_date_time=c;}								
 		void set_dep_airport(string c){dep_airport=c;}									
 		void set_arr_airport(string c){arr_airport=c;}
-		void set_rows(string c);						//returns int of index									
+		void set_rows(string c);						//returns int of index
+		void set_rows(string c,int index);						//overloaded function									
 		
 		//utilities
 		void print_rows();
@@ -87,12 +88,12 @@ int main(){
 			case 3:
 				seat_availability();
 				break;
-			/*	
+				
 			case 4:
 				seat_booking();
 				//cout<<"Array data after:"<<a.flight_details[0].row_no[0]<<endl;
 				break;
-				
+			/*	
 			case 5:
 				exit();
 				*/
@@ -227,6 +228,12 @@ void flight::set_rows(string c){
 	row_no[row_index]=c;
 	row_index++;
 }
+
+void flight::set_rows(string c,int index){
+	row_no[index]=c;
+	cout<<"row number"<<row_no[index]<<endl;
+	
+};
 
 string flight::get_row(int i){
 
@@ -387,10 +394,11 @@ void seat_booking(){
 	for(int i=0;i<list.size();i++){
 		
 		fptr=&list[i];					//advance  pointer eachtime
+		bool row_flag=0;					//Flag to check if row is correct
 		if(number==fptr->get_flightno()){
 			
 			flight_flag=1;
-			if(fptr->is_empty()){
+			if(fptr->is_empty()){			//IF empty display it
 				
 				cout<<"--Sorry,all seats are booked--"<<endl;
 				break;
@@ -399,10 +407,73 @@ void seat_booking(){
 			cout<<"Enter Seat row: "<<endl;
 			cin>>seat_row;
 			
-			string seat_no;
-			cout<<"Enter seat number: "<<endl;
-			cin>>seat_no;
+			int counter=0;					//counter to keep track of current row
+			string s=fptr->get_row(counter);
+			while(fptr->get_row(counter).length()!=0){			//Keep on checking till row is empty
+				
+				s=fptr->get_row(counter);
+				string token_1;					//Store row
+				int pos = 0;
+				int count=0;
+				string delimiter = " ";										//delimeter used to split
+				if((pos=s.find(" B "))!= string::npos || (pos=s.find(" E "))!= string::npos){					//process to break
+					
+					token_1= s.substr(0, pos);
+					//cout<<"token "<<token_1<<endl;
+					if(token_1==seat_row){
+						
+						row_flag=1;
+						cout<<"Seat row is correct"<<endl;
+						
+						string seat_no;
+						cout<<"Enter seat number: "<<endl;
+						cin>>seat_no;
+						
+						s.erase(0, pos + delimiter.length());
+						//cout<<"s after 1 "<<s<<endl;
+						string token_2= s.substr(0, pos);							//class only
+						//cout<<"token 2 "<<s<<endl;
+						s.erase(0, 2 );
+						string token_3=s;
+						//cout<<"token_1 "<<token_1<<endl;
+						//cout<<"token_2 "<<token_2<<endl;
+						//cout<<"token_3 "<<token_3<<endl;
+						
+						int index=token_3.find(seat_no);					//Index to be used to delete
+						bool seat_flag=0;
+						if (index != string::npos){ 						//Confirming the founding 
+        					//cout << "First occurrence is " << index << endl;
+        					seat_flag=1;									//Set seat_flag to 1 to prevent break
+        				}
+        				if(!seat_flag){
+        					cerr<<"----Sorry,the seat is not available----"<<endl;
+        					break;
+						}
+						cout<<"index"<<index;
+						token_3.erase(index,1);
+						
+						if(token_3==""){									//If there are no more seats
+							cout<<"empty"<<endl;
+							cout<<"\0"<<endl;								//CHECK
+							
+						}else{
+																		//Concatenation only happens if at least one seat is there
+							string new_token=token_1+delimiter+token_2+token_3;
+							//cout<<"new_token "<<new_token<<endl;
+							fptr->set_rows(new_token,counter);
+						}
+						break;				//EXPERIMENTAL
+					}
+				}
+				counter++;	
+			}
+		
+			if(!row_flag){
+				cerr<<"----Sorry,the row is not available----"<<endl;
+			}
 		}
 	}
-	
+	if(!flight_flag){
+		cerr<<"----Sorry,flight is not available----"<<endl;
+	}
 }
