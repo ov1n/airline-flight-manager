@@ -72,10 +72,11 @@ int main(){
 	cout<<endl<<"------ MAIN MENU ------"<<endl<<"1 Display available flights"<<endl<<"2 View flight"<<endl<<"3 Seat availability"<<endl<<"4 Seat booking"<<endl<<"5 Exit"<<endl<<"------------------------"<<endl<<endl;
 	
 	int choice;
-	cin>>choice;					//get user's choice
+	
 	
 	flight a ;
-	do{		
+	while(choice!=5){
+		cin>>choice;					//get user's choice		
 		//a.display_available();
 		switch(choice){
 			
@@ -103,13 +104,13 @@ int main(){
 				
 			default:
 				cout<<"Wrong output"<<endl;
-				break;
+				
 		}
 		if(choice!=5){
 			cout<<endl<<"1 Display available flights"<<endl<<"2 View flight"<<endl<<"3 Seat availability"<<endl<<"4 Seat booking"<<endl<<"5 Exit"<<endl<<endl;
-			cin>>choice;	
+			//cin>>choice;	
 		} 
-	}while(choice!=6);
+	}
 	
 	return 0;
 }
@@ -443,7 +444,7 @@ void seat_booking(){
 					if(token_1==seat_row){
 						
 						row_flag=1;
-						cout<<"Seat row is correct"<<endl;
+						cout<<"Seats of that row are available"<<endl;
 						
 						string seat_no;
 						cout<<"Enter seat number: "<<endl;
@@ -484,7 +485,7 @@ void seat_booking(){
 							//cout<<"new_token "<<new_token<<endl;
 							fptr->set_rows(new_token,counter);
 						}
-						cout<<"Seat "<<seat_no<<" of row "<<seat_row<<" has been successfully booked"<<endl;
+						cout<<endl<<"Seat "<<seat_no<<" of row "<<seat_row<<" has been successfully booked"<<endl<<endl;
 						break;				//EXPERIMENTAL
 					}
 				}
@@ -503,7 +504,7 @@ void seat_booking(){
 
 void write_exit(){
 	
-	ofstream outfile("Flightsr.txt",ios::app);
+	ofstream outfile("Flightsr.txt");
 	cout<<"start"<<endl;
 	
 	if(outfile.is_open())
